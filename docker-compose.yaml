@@ -1,6 +1,6 @@
 services:
   doodle_battery_service:
-    image: doodle_battery_service:arm64
+    image: doodle_battery_service:latest
     platform: linux/arm64
     network_mode: host
     restart: unless-stopped
