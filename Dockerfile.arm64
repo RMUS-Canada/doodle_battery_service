@@ -1,9 +1,0 @@
-FROM arm64v8/python:3.10-slim
-
-COPY docker-requirements.txt prebuilt/*.whl /tmp/
-RUN pip install --no-cache-dir -r /tmp/docker-requirements.txt --find-links /tmp/
-
-COPY build_signal.py battery_service.py core_io_helpers.py /app/
-WORKDIR /app
-
-ENTRYPOINT ["python", "/app/battery_service.py", "--port", "50051"]

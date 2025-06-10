@@ -80,7 +80,7 @@ if __name__ == '__main__':
     HOST_IP = "10.223.68.37"
     USERNAME = "configurator"
     PASSWORD = "test"
-    PORT = 51081
+    PORT = options.port
 
     service_runner = run_service(robot, host_ip=HOST_IP, username=USERNAME, password=PASSWORD, port=PORT)
 

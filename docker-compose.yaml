@@ -1,0 +1,9 @@
+services:
+  doodle_battery_service:
+    image: doodle_battery_service:arm64
+    platform: linux/arm64
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - /opt/payload_credentials:/opt/payload_credentials
+    command: --port 51707 --host-ip 192.168.50.58 192.168.50.3 --payload-credentials-file /opt/payload_credentials/spot_dev_creds.txt
