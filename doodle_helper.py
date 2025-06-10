@@ -3,12 +3,18 @@ import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
+BATTERY_VOLTAGE_MAX = 8.4
+BATTERY_VOLTAGE_MIN = 6.6
+
 class StationDiscovery:
     def __init__(self, logger, cache_ttl_minutes: int = 5):
         self.logger = logger
         self.cache_ttl = timedelta(minutes=cache_ttl_minutes)
         self.discovered_stations: Dict[str, str] = {}  # {mac_address: ip_address}
         self.last_discovery: Optional[datetime] = None
+    
+    def _estimate_percentage(self, voltage: float) -> float:
+        return max(0, min(100, ((voltage - BATTERY_VOLTAGE_MIN) / (BATTERY_VOLTAGE_MAX - BATTERY_VOLTAGE_MIN)) * 100.0))
     
     def _mac_to_ip(self, mac_address: str) -> str:
         """Convert MAC address to IP address using the network scheme."""
@@ -76,7 +82,8 @@ class StationDiscovery:
             results.append({
                 'mac_address': mac_address,
                 'ip_address': ip_address,
-                'voltage': voltage
+                'voltage': voltage,
+                'battery_percentage': self._estimate_percentage(voltage)
             })
         
         return results

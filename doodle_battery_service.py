@@ -48,27 +48,24 @@ class DoodleBatteryAdapter:
         request_caps = ", ".join(
             data_capture.name for data_capture in request.data_captures
         )
-        _LOGGER.info(f"get_live_data called, request capabilities {request_caps}")
+        # _LOGGER.info(f"get_live_data called, request capabilities {request_caps}")
 
         # Get all reachable stations with fresh voltage readings
         stations = self.doodle_helper.get_all_reachable_stations()
         
         # Build signals for all stations
-        live_data = []
-        for station in stations:
-            signals = build_signals(station['voltage'], station['mac_address'])
-            live_data.append(build_capability_live_data(signals, CAPABILITY.name))
+        signals = build_signals(stations)
 
-        return build_live_data_response(live_data)
+        return build_live_data_response([build_capability_live_data(signals, CAPABILITY.name)])
 
-def make_servicer(host_ip, username, password):
+def make_servicer(sdk_robot, host_ip, username, password):
     adapter = DoodleBatteryAdapter(host_ip, username, password)
-    return DataAcquisitionPluginService(adapter.get_battery_data, live_response_fn=adapter.get_live_data, logger=_LOGGER)
+    return DataAcquisitionPluginService(sdk_robot, [CAPABILITY], adapter.get_battery_data, live_response_fn=adapter.get_live_data, logger=_LOGGER)
 
-def run_service(host_ip, username, password, port):
+def run_service(sdk_robot, host_ip, username, password, port):
     add_servicer_to_server_fn = data_acquisition_plugin_service_pb2_grpc.add_DataAcquisitionPluginServiceServicer_to_server
 
-    return GrpcServiceRunner(make_servicer(host_ip, username, password), add_servicer_to_server_fn, port, logger=_LOGGER)
+    return GrpcServiceRunner(make_servicer(sdk_robot,host_ip, username, password), add_servicer_to_server_fn, port, logger=_LOGGER)
 
 if __name__ == '__main__':
     import argparse
@@ -90,7 +87,7 @@ if __name__ == '__main__':
     PASSWORD = "test"
     PORT = 51081
 
-    service_runner = run_service(host_ip=HOST_IP, username=USERNAME, password=PASSWORD, port=PORT)
+    service_runner = run_service(robot, host_ip=HOST_IP, username=USERNAME, password=PASSWORD, port=PORT)
 
     dir_reg_client = robot.ensure_client(DirectoryRegistrationClient.default_service_name)
     keep_alive = DirectoryRegistrationKeepAlive(dir_reg_client, logger=_LOGGER)
