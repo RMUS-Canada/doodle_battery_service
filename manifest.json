@@ -1,0 +1,6 @@
+{
+    "description": "DoodleLabs Battery Service",
+    "version": "1.0.0",
+    "images": ["image.tar.gz"],
+    "extension_name": "doodlelabs-battery-service"
+}
