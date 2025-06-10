@@ -30,7 +30,7 @@ class DoodleBatteryAdapter:
     
     def get_battery_data(self, request, store_helper):
         data_id = data_acquisition_pb2.DataIdentifier(action_id=request.action_id, channel=CAPABILITY.channel_name)
-        data = self.doodle_helper.get_battery_data()
+        data = self.doodle_helper.get_battery_voltage()
         
         store_helper.cancel_check()
         store_helper.state.set_status(data_acquisition_pb2.GetStatusResponse.STATUS_SAVING)
@@ -38,7 +38,7 @@ class DoodleBatteryAdapter:
         message = data_acquisition_pb2.AssociatedMetadata()
         message.reference_id.action_id.CopyFrom(request.action_id)
         message.metadata.data.update({
-            "bettery_voltage": data
+            "battery_voltage": data
         })
         _LOGGER.info(f"Retrieving battery data : {message.metadata.data}")
 
@@ -50,10 +50,13 @@ class DoodleBatteryAdapter:
         )
         _LOGGER.info(f"get_live_data called, request capabilities {request_caps}")
 
-        # Discover neighbors and query their battery voltages
-
+        # Get all reachable stations with fresh voltage readings
+        stations = self.doodle_helper.get_all_reachable_stations()
+        
+        # Build signals for all stations
         signals = build_capability_live_data(request, CAPABILITY)
-        signals.update(build_signals(self.doodle_helper.get_battery_data()))
+        for station in stations:
+            signals.update(build_signals(station['voltage'], station['mac_address']))
 
         return build_live_data_response(signals)
 
@@ -84,7 +87,7 @@ if __name__ == '__main__':
     HOST_IP = "10.223.68.37"
     USERNAME = "configurator"
     PASSWORD = "test"
-    PORT = 58008
+    PORT = 51081
 
     service_runner = run_service(host_ip=HOST_IP, username=USERNAME, password=PASSWORD, port=PORT)
 
