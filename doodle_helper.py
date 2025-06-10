@@ -15,7 +15,7 @@ REQUEST_TIMEOUT = 2  # seconds
 MAX_WORKERS = 10  # maximum number of concurrent requests
 
 class StationDiscovery:
-    def __init__(self, logger, cache_ttl_minutes: int = 5):
+    def __init__(self, logger, cache_ttl_minutes: int = 1):
         self.logger = logger
         self.cache_ttl = timedelta(minutes=cache_ttl_minutes)
         self.discovered_stations: Dict[str, str] = {}  # {mac_address: ip_address}
