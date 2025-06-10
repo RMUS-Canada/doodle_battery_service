@@ -1,4 +1,5 @@
 import logging
+import os
 
 from bosdyn.api import data_acquisition_pb2, data_acquisition_plugin_service_pb2_grpc
 from bosdyn.client.data_acquisition_store import DataAcquisitionStoreClient
@@ -77,12 +78,11 @@ if __name__ == '__main__':
     guid, secret = bosdyn.client.util.get_guid_and_secret(options)
     robot.authenticate_from_payload_credentials(guid, secret)
 
-    HOST_IP = "10.223.68.37"
-    USERNAME = "configurator"
-    PASSWORD = "test"
-    PORT = options.port
+    HOST_IP = os.getenv("RADIO_IP")
+    USERNAME = os.getenv("RPC_USERNAME")
+    PASSWORD = os.getenv("RPC_PASSWORD")
 
-    service_runner = run_service(robot, host_ip=HOST_IP, username=USERNAME, password=PASSWORD, port=PORT)
+    service_runner = run_service(robot, host_ip=HOST_IP, username=USERNAME, password=PASSWORD, port=options.port)
 
     dir_reg_client = robot.ensure_client(DirectoryRegistrationClient.default_service_name)
     keep_alive = DirectoryRegistrationKeepAlive(dir_reg_client, logger=_LOGGER)
