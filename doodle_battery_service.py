@@ -45,11 +45,6 @@ class DoodleBatteryAdapter:
         store_helper.store_metadata(message, data_id)
     
     def get_live_data(self, request):
-        request_caps = ", ".join(
-            data_capture.name for data_capture in request.data_captures
-        )
-        # _LOGGER.info(f"get_live_data called, request capabilities {request_caps}")
-
         # Get all reachable stations with fresh voltage readings
         stations = self.doodle_helper.get_all_reachable_stations()
         
