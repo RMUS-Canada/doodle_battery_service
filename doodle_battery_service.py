@@ -54,11 +54,12 @@ class DoodleBatteryAdapter:
         stations = self.doodle_helper.get_all_reachable_stations()
         
         # Build signals for all stations
-        signals = build_capability_live_data(request, CAPABILITY)
+        live_data = []
         for station in stations:
-            signals.update(build_signals(station['voltage'], station['mac_address']))
+            signals = build_signals(station['voltage'], station['mac_address'])
+            live_data.append(build_capability_live_data(signals, CAPABILITY.name))
 
-        return build_live_data_response(signals)
+        return build_live_data_response(live_data)
 
 def make_servicer(host_ip, username, password):
     adapter = DoodleBatteryAdapter(host_ip, username, password)
