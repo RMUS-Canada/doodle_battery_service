@@ -11,4 +11,3 @@ COPY build_signal.py doodle_battery_service.py doodle_helper.py core_io_helpers.
 WORKDIR /app
 
 ENTRYPOINT ["python", "/app/doodle_battery_service.py"]
-CMD ["--port", "51707", "192.168.50.3", "--host-ip", "192.168.50.58", "--payload-credentials-file", "/creds/payload_guid_and_secret"]   
