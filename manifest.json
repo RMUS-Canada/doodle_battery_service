@@ -1,6 +1,6 @@
 {
-    "description": "DoodleLabs Battery Service",
+    "description": "Doodle MeshRider Battery Service",
     "version": "1.0.0",
-    "images": ["image.tar.gz"],
-    "extension_name": "doodlelabs-battery-service"
+    "images": ["doodle_battery_service.tgz"],
+    "extension_name": "doodle-battery-service"
 }
