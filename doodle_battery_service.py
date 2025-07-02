@@ -15,6 +15,7 @@ from bosdyn.client.signals_helpers import build_capability_live_data, build_live
 
 from doodle_helper import DoodleHelper
 from build_signal import build_signals
+import bosdyn.client.exceptions as bd_exceptions
 
 DIRECTORY_NAME = 'data-acquisition-doodle-battery'
 AUTHORITY = 'data-acquisition-doodle-battery'
@@ -69,6 +70,17 @@ def run_service(sdk_robot, host_ip, username, password, port):
 
     return GrpcServiceRunner(make_servicer(sdk_robot,host_ip, username, password), add_servicer_to_server_fn, port, logger=_LOGGER)
 
+def authenticate_with_backoff(robot, guid, secret, max_retries=5, base_interval=5.0):
+    for attempt in range(max_retries):
+        try:
+            robot.authenticate_from_payload_credentials(guid, secret, retry_interval=base_interval)
+            return True
+        except bd_exceptions.TooManyRequestsError as e:
+            wait_time = base_interval * (2 ** attempt)
+            _LOGGER.info(f"Too many requests, retrying in {wait_time} seconds...")
+            time.sleep(wait_time)
+    raise RuntimeError("Failed to authenticate after multiple attempts due to TooManyRequestsError.")
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
@@ -82,16 +94,18 @@ if __name__ == '__main__':
     sdk = bosdyn.client.create_standard_sdk("DoodleBatteryService")
     robot = sdk.create_robot(options.hostname)
     guid, secret = bosdyn.client.util.get_guid_and_secret(options)
+    authenticate_with_backoff(robot, guid, secret)
 
-    time.sleep(5)
-    robot.authenticate_from_payload_credentials(guid, secret, retry_interval=5.0)
+    # old way
+    # HOST_IP = os.getenv("RADIO_IP")
+    # USERNAME = os.getenv("RPC_USERNAME")
+    # PASSWORD = os.getenv("RPC_PASSWORD")
 
-    HOST_IP = os.getenv("RADIO_IP")
-    USERNAME = os.getenv("RPC_USERNAME")
-    PASSWORD = os.getenv("RPC_PASSWORD")
-
+    # Read RPC credentials from file
     rpc_cred = open("/doodle_rpc_credentials", "r").read().splitlines()
-    _LOGGER.info(f"RPC credentials: {rpc_cred}")
+    HOST_IP = rpc_cred[0]
+    USERNAME = rpc_cred[1]
+    PASSWORD = rpc_cred[2]
 
     service_runner = run_service(robot, host_ip=HOST_IP, username=USERNAME, password=PASSWORD, port=options.port)
 
