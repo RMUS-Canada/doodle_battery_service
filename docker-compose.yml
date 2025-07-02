@@ -2,9 +2,7 @@ services:
   doodle_battery_service:
     image: "doodle_battery_service:latest"
     platform: "linux/arm64"
-    network_mode: "bridge"
-    ports:
-      - "51707:51707"
+    network_mode: "host"
     restart: unless-stopped
     volumes:
       # Mount payload credentials.
