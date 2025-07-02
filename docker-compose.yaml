@@ -1,13 +1,21 @@
 services:
   doodle_battery_service:
-    image: doodle_battery_service:latest
-    platform: linux/arm64
-    network_mode: host
+    image: "doodle_battery_service:latest"
+    platform: "linux/arm64"
+    network_mode: "bridge"
+    ports:
+      - "51707:51707"
     restart: unless-stopped
     volumes:
-      - /opt/payload_credentials:/opt/payload_credentials
-    # fixme: remove hardcoded values
-    command: --port 51707 --host-ip 192.168.50.58 192.168.50.3 --payload-credentials-file /opt/payload_credentials/spot_dev_creds.txt
+      # Mount payload credentials.
+      - /opt/payload_credentials/payload_guid_and_secret:/payload_guid_and_secret
+      - /persist/opt/doodle_rpc_credentials:/doodle_rpc_credentials
+    command: 192.168.50.3 --port 51707 --host-ip 192.168.50.58 --payload-credentials-file /payload_guid_and_secret
+    deploy:
+      resources:
+        limits:
+          memory: "512M"
+    oom_score_adj: 1000
     environment:
       - RADIO_IP=10.223.68.37
       - RPC_USERNAME=configurator

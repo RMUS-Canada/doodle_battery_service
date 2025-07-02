@@ -82,6 +82,9 @@ if __name__ == '__main__':
     USERNAME = os.getenv("RPC_USERNAME")
     PASSWORD = os.getenv("RPC_PASSWORD")
 
+    rpc_cred = open("/doodle_rpc_credentials", "r").read().splitlines()
+    _LOGGER.info(f"RPC credentials: {rpc_cred}")
+
     service_runner = run_service(robot, host_ip=HOST_IP, username=USERNAME, password=PASSWORD, port=options.port)
 
     dir_reg_client = robot.ensure_client(DirectoryRegistrationClient.default_service_name)
