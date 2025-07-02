@@ -14,7 +14,3 @@ services:
         limits:
           memory: "512M"
     oom_score_adj: 1000
-    environment:
-      - RADIO_IP=10.223.42.21
-      - RPC_USERNAME=configurator
-      - RPC_PASSWORD=test

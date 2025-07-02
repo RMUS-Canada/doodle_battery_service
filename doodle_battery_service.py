@@ -48,14 +48,9 @@ class DoodleBatteryAdapter:
         store_helper.store_metadata(message, data_id)
     
     def get_live_data(self, request):
-        # Get all reachable stations with fresh voltage readings
-        stations = self.doodle_helper.get_all_reachable_stations()
+        # Get all reachable stations with fresh voltage readings except the local station
+        stations = [station for station in self.doodle_helper.get_all_reachable_stations() if station['ip_address'] != self.host_ip]
 
-        # Remove local station from list
-        _LOGGER.info(f"Local IP: {self.host_ip}")
-        _LOGGER.info(f"Stations Before: {stations}")
-        stations = [station for station in stations if station['ip_address'] != self.host_ip]
-        _LOGGER.info(f"Stations After: {stations}")
         # Build signals for all stations
         signals = build_signals(stations)
 
@@ -95,11 +90,6 @@ if __name__ == '__main__':
     robot = sdk.create_robot(options.hostname)
     guid, secret = bosdyn.client.util.get_guid_and_secret(options)
     authenticate_with_backoff(robot, guid, secret)
-
-    # old way
-    # HOST_IP = os.getenv("RADIO_IP")
-    # USERNAME = os.getenv("RPC_USERNAME")
-    # PASSWORD = os.getenv("RPC_PASSWORD")
 
     # Read RPC credentials from file
     rpc_cred = open("/doodle_rpc_credentials", "r").read().splitlines()
