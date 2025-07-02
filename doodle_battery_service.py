@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 from bosdyn.api import data_acquisition_pb2, data_acquisition_plugin_service_pb2_grpc
 from bosdyn.client.data_acquisition_store import DataAcquisitionStoreClient
@@ -76,7 +77,9 @@ if __name__ == '__main__':
     sdk = bosdyn.client.create_standard_sdk("DoodleBatteryService")
     robot = sdk.create_robot(options.hostname)
     guid, secret = bosdyn.client.util.get_guid_and_secret(options)
-    robot.authenticate_from_payload_credentials(guid, secret)
+
+    time.sleep(5)
+    robot.authenticate_from_payload_credentials(guid, secret, retry_interval=5.0)
 
     HOST_IP = os.getenv("RADIO_IP")
     USERNAME = os.getenv("RPC_USERNAME")
