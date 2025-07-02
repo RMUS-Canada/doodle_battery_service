@@ -47,7 +47,7 @@ class StationDiscovery:
         """Check if a radio is responsive by attempting a TCP connection."""
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(1)  # 1 second timeout for connection
+            sock.settimeout(2)  # 2 second timeout for connection
             result = sock.connect_ex((ip_address, 443))  # HTTPS port
             sock.close()
             return result == 0

@@ -51,10 +51,10 @@ class DoodleBatteryAdapter:
         stations = self.doodle_helper.get_all_reachable_stations()
 
         # Remove local station from list
-        octets = self.host_ip.split('.')
-        local_mac = f"{hex(int(octets[-2]))[2:]}:{hex(int(octets[-1]))[2:]}"
-        stations = [station for station in stations if not station['mac_address'].endswith(local_mac)]
-        
+        _LOGGER.info(f"Local IP: {self.host_ip}")
+        _LOGGER.info(f"Stations Before: {stations}")
+        stations = [station for station in stations if station['ip_address'] != self.host_ip]
+        _LOGGER.info(f"Stations After: {stations}")
         # Build signals for all stations
         signals = build_signals(stations)
 
