@@ -49,6 +49,11 @@ class DoodleBatteryAdapter:
     def get_live_data(self, request):
         # Get all reachable stations with fresh voltage readings
         stations = self.doodle_helper.get_all_reachable_stations()
+
+        # Remove local station from list
+        octets = self.host_ip.split('.')
+        local_mac = f"{hex(int(octets[-2]))[2:]}:{hex(int(octets[-1]))[2:]}"
+        stations = [station for station in stations if not station['mac_address'].endswith(local_mac)]
         
         # Build signals for all stations
         signals = build_signals(stations)
