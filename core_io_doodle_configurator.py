@@ -133,7 +133,7 @@ def undo_configuration():
 # GUI setup
 root = tk.Tk()
 root.title("CORE I/O Doodle Config Tool")
-root.geometry("400x430")
+root.geometry("400x400")
 root.resizable(False, False)
 
 # --- CORE I/O Connection Frame ---
