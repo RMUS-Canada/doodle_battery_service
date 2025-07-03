@@ -9,7 +9,7 @@ import socket
 
 from urllib3 import Retry
 
-BATTERY_VOLTAGE_MAX = 8.4
+BATTERY_VOLTAGE_MAX = 8.2
 BATTERY_VOLTAGE_MIN = 6.6
 REQUEST_TIMEOUT = 2  # seconds
 MAX_WORKERS = 10  # maximum number of concurrent requests
