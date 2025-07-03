@@ -37,7 +37,7 @@ def configure_radio():
         sftp.close()
 
         # Move credentials file to /etc with sudo and set permissions
-        move_cmd = f"sudo -S mv {temp_path} {credentials_path} && sudo -S chmod 600 {credentials_path}"
+        move_cmd = f"sudo -S mv -f -T {temp_path} {credentials_path} && sudo -S chmod 600 {credentials_path}"
         stdin, stdout, stderr = ssh.exec_command(move_cmd, get_pty=True)
         stdin.write(f'{ssh_password}\n')
         stdin.flush()
