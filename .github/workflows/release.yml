@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download .spx artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: spot-extension
+          path: artifacts/
+
+      - name: Download Windows exe
+        uses: actions/download-artifact@v4
+        with:
+          name: doodle-configurator-exe-windows-latest
+          path: artifacts/
+
+      - name: Download Mac exe
+        uses: actions/download-artifact@v4
+        with:
+          name: doodle-configurator-exe-macos-latest
+          path: artifacts/
+
+      - name: Download Linux exe
+        uses: actions/download-artifact@v4
+        with:
+          name: doodle-configurator-exe-ubuntu-latest
+          path: artifacts/
+
+      - name: Create GitHub Release and upload all artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
