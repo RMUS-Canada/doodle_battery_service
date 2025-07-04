@@ -32,7 +32,7 @@ class StationDiscovery:
     def remove_station(self, mac_address: str) -> None:
         """Remove a station from the cache and reset its failed login attempts."""
         if mac_address in self.discovered_stations:
-            self.logger.warning(f"Removing unreachable station {mac_address} from cache")
+            self.logger.warning(f"Removing unreachable radio {mac_address} from cache")
             del self.discovered_stations[mac_address]
         if mac_address in self.failed_login_attempts:
             del self.failed_login_attempts[mac_address]
@@ -83,7 +83,7 @@ class StationDiscovery:
                 if self.failed_login_attempts[mac_address] >= 3:
                     self.remove_station(mac_address)
         except Exception as e:
-            self.logger.debug(f"Error processing station {mac_address}: {str(e)}")
+            self.logger.debug(f"Error processing radio {mac_address}: {str(e)}")
         finally:
             station_helper.logout()
         
@@ -122,7 +122,7 @@ class StationDiscovery:
 
     def update_station_cache(self, root_station: 'DoodleHelper') -> None:
         """Update the cache of all reachable stations (topology only)."""
-        self.logger.info("Updating station topology cache...")
+        self.logger.info("Updating radio topology cache...")
         visited = set()
         
         # Reset failed login attempts when updating cache
@@ -133,7 +133,7 @@ class StationDiscovery:
         self._discover_neighbors(root_station, visited)
         
         self.last_discovery = datetime.now()
-        self.logger.info(f"Topology cache updated. Found {len(self.discovered_stations)} stations.")
+        self.logger.info(f"Topology cache updated. Found {len(self.discovered_stations)} radios.")
 
     def get_station_voltages(self, root_station: 'DoodleHelper') -> List[Dict[str, any]]:
         """Get fresh voltage readings for all discovered stations concurrently."""
@@ -153,7 +153,7 @@ class StationDiscovery:
                     if result is not None:
                         results.append(result)
                 except Exception as e:
-                    self.logger.debug(f"Error processing station result: {str(e)}")
+                    self.logger.debug(f"Error processing radio result: {str(e)}")
 
         return results
 
@@ -247,7 +247,7 @@ class DoodleHelper:
 
             return None
         except Exception as e:
-            self.logger.debug(f"Error getting associated stations from {self.url}: {str(e)}")
+            self.logger.debug(f"Error getting associated radios from {self.url}: {str(e)}")
             return None
     
     def get_all_reachable_stations(self) -> List[Dict[str, any]]:
