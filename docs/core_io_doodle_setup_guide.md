@@ -2,10 +2,10 @@
 
 This guide will walk you through the steps for setting up the Doodle Battery Service extension on Spot CORE I/O.
 
-Ensure you have downloaded all the necessary files. You should have the following:
+Ensure you have downloaded all the necessary files. The ZIP file you downloaded should contain the following:
+- A folder named "dist" containing the core_io_doodle_configurator tool
 - DoodleBatteryService.spx
-- core_io_doodle_configurator.exe
-- Core I/O Doodle Battery Service Setup Guide (this document)
+- core_io_doodle_setup_guide.pdf (this document)
 
 ## Connecting to CORE I/O via Ethernet
 You must first attach an Ethernet cable from your computer to CORE I/O. CORE I/O has two available Ethernet ports that can be accessed by unscrewing and removing the lid.
@@ -16,7 +16,7 @@ You must first attach an Ethernet cable from your computer to CORE I/O. CORE I/O
 4. Attach the lid to CORE I/O.
 5. Plug the other end of the Ethernet cable into your computer.
 
-<img src="coreio_doodle_img/core_io.png" width="400px" />
+<img src="coreio_doodle_img/core_io.png" height="400px" />
 
 ### Setting a Static IP Address on Windows
 In order to reach CORE I/O over the network you must set a static IP to your computer on the same subnet as CORE I/O. Here are the steps for setting a static IP on Windows.
@@ -71,7 +71,7 @@ To verify that the extension is running you can check in the Spot app. You shoul
 ## CORE I/O Setup Procedure
 CORE I/O will need to configured in order for the extension to communicate properly with your Doodle radio network and report the battery percentages. Here are the steps for configuring your CORE I/O.
 
-Launch `CORE IO Doodle Config Tool.exe`. You should see this window.
+Launch `core_io_doodle_configurator.exe`. You should see this window.
 
 <img src="coreio_doodle_img/tool1.png" width="400px" />
 
