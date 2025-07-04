@@ -4,8 +4,54 @@ This guide will walk you through the steps for setting up the Doodle Battery Ser
 
 Ensure you have downloaded all the necessary files. You should have the following:
 - DoodleBatteryService.spx
-- Core IO Doodle Config Tool.exe
+- core_io_doodle_configurator.exe
 - Core I/O Doodle Battery Service Setup Guide (this document)
+
+## Connecting to CORE I/O via Ethernet
+You must first attach an Ethernet cable from your computer to CORE I/O. CORE I/O has two available Ethernet ports that can be accessed by unscrewing and removing the lid.
+
+1. Unscrew and remove the lid of your CORE I/O payload.
+2. Plug an Ethernet cable into an available port on CORE I/O.
+3. Optionally route the cable through the yellow cable routing block.
+4. Attach the lid to CORE I/O.
+5. Plug the other end of the Ethernet cable into your computer.
+
+<img src="coreio_doodle_img/core_io.png" width="400px" />
+
+### Setting a Static IP Address on Windows
+In order to reach CORE I/O over the network you must set a static IP to your computer on the same subnet as CORE I/O. Here are the steps for setting a static IP on Windows.
+
+Step 1 - Open the **Settings** and go to **Network & internet**.
+
+<img src="coreio_doodle_img/settings.png" width="400px" />
+
+Step 2 - Click **Ethernet**.
+
+<img src="coreio_doodle_img/ethernet.png" width="400px" />
+
+Step 3 - Under **IP Assignment** click **Edit**.
+
+<img src="coreio_doodle_img/ip_assignment.png" width="400px" />
+
+Step 4 - Select **Manual** from the drop-down menu.
+
+<img src="coreio_doodle_img/manual.png" width="400px" />
+
+Step 5 - Enable **IPv4**.
+
+<img src="coreio_doodle_img/ipv4.png" width="400px" />
+
+Step 6 - Enter your desired **IP address**. This must be of the format `192.168.50.X`. The IP address must be **unique**. It cannot be `192.168.50.3` or `192.168.50.5` or any other existing device on the `192.168.50.X` network. In this example, we're using the available IP of `192.168.50.77`.
+
+Step 7 - Enter `255.255.255.0` as the **Subnet mask**, and `192.168.50.1` as the **Gateway**.
+
+Step 8 - Enter **Preferred DNS** (e.g., `8.8.8.8`) or leave blank.
+
+<img src="coreio_doodle_img/filled_fields.png" width="400px" />
+
+Step 9 - Click **Save** to save changes, then close all dialogs.
+
+Your computer now has a static IP address.
 
 ## Installing the Doodle Battery Service Extension on CORE I/O
 The Doodle Battery Service Spot extension reports the battery percentage of each Doodle mesh radio in your network and displays it to the screen in the Spot app. Here are the steps for installing the extension.
@@ -22,17 +68,8 @@ To verify that the extension is running you can check in the Spot app. You shoul
 
 <img src="coreio_doodle_img/bad.jpg" width="400px" />
 
-
 ## CORE I/O Setup Procedure
 CORE I/O will need to configured in order for the extension to communicate properly with your Doodle radio network and report the battery percentages. Here are the steps for configuring your CORE I/O.
-
-We recommend connecting to CORE I/O using an Ethernet connection during this setup procedure. This ensures a stable connection when configuring network settings. CORE I/O has two ethernet ports that can be accessed by unscrewing and removing the lid.
-
-In order to configure CORE I/O over a network cable, you will need to set your computer's IP address to any address on the `192.168.50.X` network except:
-- `192.168.50.5`
-- `192.168.50.3`
-
-The subnet mask should be `255.255.255.0`. The gateway and DNS fields can be omitted.
 
 Launch `CORE IO Doodle Config Tool.exe`. You should see this window.
 
