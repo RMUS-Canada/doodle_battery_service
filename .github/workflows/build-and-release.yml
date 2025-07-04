@@ -43,7 +43,7 @@ jobs:
           path: ${{ steps.get_ext_name.outputs.ext_name }}.spx
 
   build_exe:
-    name: Build Configurator Executable
+    name: Build Configurator Executable and Bundle ZIP
     needs: build_spx
     runs-on: ${{ matrix.os }}
     strategy:
@@ -67,45 +67,72 @@ jobs:
         run: |
           pyinstaller --onefile --windowed core_io_doodle_configurator.py
 
-      - name: Upload executable as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: config-tool-${{ matrix.os }}
-          path: |
-            dist/core_io_doodle_configurator*
-  
-  release:
-    name: Create Release and Upload Artifacts
-    needs: [build_spx, build_exe]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Spot Extension artifact
+      - name: Download SPX artifact
         uses: actions/download-artifact@v4
         with:
           name: spot-extension
-          path: artifacts/
+          path: .
 
-      - name: Download Windows exe
+      - name: Copy PDF guide
+        run: |
+          cp docs/core_io_doodle_setup_guide.pdf .
+
+      - name: Prepare ZIP contents
+        id: zipinfo
+        run: |
+          # Set platform-specific executable name
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            # EXE="dist/core_io_doodle_configurator.exe"
+            EXE="dist/**"
+            ZIP="doodle_battery_bundle-windows.zip"
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            # EXE="dist/core_io_doodle_configurator"
+            EXE="dist/**"
+            ZIP="doodle_battery_bundle-macos.zip"
+          else
+            # EXE="dist/core_io_doodle_configurator"
+            EXE="dist/**"
+            ZIP="doodle_battery_bundle-linux.zip"
+          fi
+          echo "EXE=$EXE" >> $GITHUB_OUTPUT
+          echo "ZIP=$ZIP" >> $GITHUB_OUTPUT
+
+      - name: Create ZIP bundle
+        run: |
+          zip "${{ steps.zipinfo.outputs.ZIP }}" "${{ steps.zipinfo.outputs.EXE }}" *.spx core_io_doodle_setup_guide.pdf
+
+      - name: Upload ZIP as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.zipinfo.outputs.ZIP }}
+          path: ${{ steps.zipinfo.outputs.ZIP }}
+
+  release:
+    name: Create Release and Upload Bundles
+    needs: [build_spx, build_exe]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows ZIP
         uses: actions/download-artifact@v4
         with:
-          name: config-tool-windows-latest
+          name: doodle_battery_bundle-windows.zip
           path: artifacts/
 
-      - name: Download Mac exe
+      - name: Download Mac ZIP
         uses: actions/download-artifact@v4
         with:
-          name: config-tool-macos-latest
+          name: doodle_battery_bundle-macos.zip
           path: artifacts/
 
-      - name: Download Linux exe
+      - name: Download Linux ZIP
         uses: actions/download-artifact@v4
         with:
-          name: config-tool-ubuntu-latest
+          name: doodle_battery_bundle-linux.zip
           path: artifacts/
 
-      - name: Create GitHub Release and upload all artifacts
+      - name: Create GitHub Release and upload all bundles
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**
+          files: artifacts/*.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_ACTIONS_RELEASE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
