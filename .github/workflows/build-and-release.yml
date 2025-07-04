@@ -88,19 +88,19 @@ jobs:
       - name: Download Windows exe
         uses: actions/download-artifact@v4
         with:
-          name: doodle-configurator-exe-windows-latest
+          name: config-tool-windows-latest
           path: artifacts/
 
       - name: Download Mac exe
         uses: actions/download-artifact@v4
         with:
-          name: doodle-configurator-exe-macos-latest
+          name: config-tool-macos-latest
           path: artifacts/
 
       - name: Download Linux exe
         uses: actions/download-artifact@v4
         with:
-          name: doodle-configurator-exe-ubuntu-latest
+          name: config-tool-ubuntu-latest
           path: artifacts/
 
       - name: Create GitHub Release and upload all artifacts
