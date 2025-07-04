@@ -1,0 +1,111 @@
+name: Build and Release Spot Extension & Configurator
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on version tags like v1.0.0
+  workflow_dispatch:
+
+jobs:
+  build_spx:
+    name: Build Spot Extension (.spx)
+    runs-on: ubuntu-latest
+    outputs:
+      ext_name: ${{ steps.get_ext_name.outputs.ext_name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (arm64)
+        run: |
+          docker buildx build --platform linux/arm64 -t doodle_battery_service:latest --load .
+
+      - name: Save Docker image to tar
+        run: |
+          docker save doodle_battery_service:latest | gzip > doodle_battery_service.tgz
+
+      - name: Get extension name from manifest.json
+        id: get_ext_name
+        run: |
+          echo "ext_name=$(jq -r .extension_name manifest.json)" >> $GITHUB_OUTPUT
+
+      - name: Create Spot Extension (.spx) file
+        run: |
+          tar zcfv "${{ steps.get_ext_name.outputs.ext_name }}.spx" doodle_battery_service.tgz docker-compose.yml manifest.json
+
+      - name: Upload .spx as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spot-extension
+          path: ${{ steps.get_ext_name.outputs.ext_name }}.spx
+
+  build_exe:
+    name: Build Configurator Executable
+    needs: build_spx
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller paramiko
+
+      - name: Build executable with PyInstaller
+        run: |
+          pyinstaller --onefile --windowed core_io_doodle_configurator.py
+
+      - name: Upload executable as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: config-tool-${{ matrix.os }}
+          path: |
+            dist/core_io_doodle_configurator*
+  
+  release:
+    name: Create Release and Upload Artifacts
+    needs: [build_spx, build_exe]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Spot Extension artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: spot-extension
+          path: artifacts/
+
+      - name: Download Windows exe
+        uses: actions/download-artifact@v4
+        with:
+          name: doodle-configurator-exe-windows-latest
+          path: artifacts/
+
+      - name: Download Mac exe
+        uses: actions/download-artifact@v4
+        with:
+          name: doodle-configurator-exe-macos-latest
+          path: artifacts/
+
+      - name: Download Linux exe
+        uses: actions/download-artifact@v4
+        with:
+          name: doodle-configurator-exe-ubuntu-latest
+          path: artifacts/
+
+      - name: Create GitHub Release and upload all artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
