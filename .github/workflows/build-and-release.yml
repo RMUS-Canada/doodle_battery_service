@@ -79,27 +79,21 @@ jobs:
 
       - name: Prepare ZIP contents
         id: zipinfo
+        shell: bash
         run: |
-          # Set platform-specific executable name
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            # EXE="dist/core_io_doodle_configurator.exe"
-            EXE="dist/**"
             ZIP="doodle_battery_bundle-windows.zip"
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            # EXE="dist/core_io_doodle_configurator"
-            EXE="dist/**"
             ZIP="doodle_battery_bundle-macos.zip"
           else
-            # EXE="dist/core_io_doodle_configurator"
-            EXE="dist/**"
             ZIP="doodle_battery_bundle-linux.zip"
           fi
-          echo "EXE=$EXE" >> $GITHUB_OUTPUT
           echo "ZIP=$ZIP" >> $GITHUB_OUTPUT
 
       - name: Create ZIP bundle
+        shell: bash
         run: |
-          zip "${{ steps.zipinfo.outputs.ZIP }}" "${{ steps.zipinfo.outputs.EXE }}" *.spx core_io_doodle_setup_guide.pdf
+          zip -r "${{ steps.zipinfo.outputs.ZIP }}" dist/ *.spx core_io_doodle_setup_guide.pdf
 
       - name: Upload ZIP as artifact
         uses: actions/upload-artifact@v4
