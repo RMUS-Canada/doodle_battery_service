@@ -1,0 +1,36 @@
+name: Build Spot Extension
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on version tags like v1.0.0
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (arm64)
+        run: |
+          docker buildx build --platform linux/arm64 -t doodle_battery_service:latest --load .
+
+      - name: Save Docker image to tar
+        run: |
+          docker save doodle_battery_service:latest | gzip > doodle_battery_service.tgz
+
+      - name: Create Spot Extension (.spx) file
+        run: |
+          EXT_NAME=$(jq -r .extension_name manifest.json)
+          tar zcfv "${EXT_NAME}.spx" doodle_battery_service.tgz docker-compose.yml manifest.json
+
+      - name: Upload Spot Extension as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spot-extension
+          path: "*.spx"
