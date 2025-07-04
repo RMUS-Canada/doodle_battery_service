@@ -17,7 +17,7 @@ You must first attach an Ethernet cable from your computer to CORE I/O. CORE I/O
 <img src="coreio_doodle_img/core_io.png" height="400px" />
 
 ### Setting a Static IP Address on Windows
-In order for your computer to reach CORE I/O over the network, you must set a static IP. Here are the steps for setting a static IP on Windows.
+In order for your computer to reach CORE I/O over the network, you must set a static IP on the same subnet as CORE I/O. Here are the steps for setting a static IP on Windows.
 
 Step 1 - Open the **Settings** and go to **Network & internet**.
 
