@@ -65,7 +65,7 @@ jobs:
 
       - name: Build executable with PyInstaller
         run: |
-          pyinstaller --onefile --windowed core_io_doodle_configurator.py
+          pyinstaller --onedir --windowed core_io_doodle_configurator.py
 
       - name: Download SPX artifact
         uses: actions/download-artifact@v4
@@ -77,29 +77,32 @@ jobs:
         run: |
           cp docs/core_io_doodle_setup_guide.pdf .
 
-      - name: Prepare ZIP contents
-        id: zipinfo
-        shell: bash
+      - name: Create ZIP bundle (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
         run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            ZIP="doodle_battery_bundle-windows.zip"
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            ZIP="doodle_battery_bundle-macos.zip"
-          else
-            ZIP="doodle_battery_bundle-linux.zip"
-          fi
-          echo "ZIP=$ZIP" >> $GITHUB_OUTPUT
+          $zipName = "doodle_battery_service-windows-latest.zip"
+          $pdf = "core_io_doodle_setup_guide.pdf"
+          $spx = Get-ChildItem *.spx | Select-Object -First 1
+          Compress-Archive -Path dist, $spx, $pdf -DestinationPath $zipName
 
-      - name: Create ZIP bundle
+      - name: Create ZIP bundle (macOS)
+        if: matrix.os == 'macos-latest'
         shell: bash
         run: |
-          zip -r "${{ steps.zipinfo.outputs.ZIP }}" dist/ *.spx core_io_doodle_setup_guide.pdf
+          zip -r "doodle_battery_service-macos-latest.zip" dist/ *.spx core_io_doodle_setup_guide.pdf
+
+      - name: Create ZIP bundle (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          zip -r "doodle_battery_service-ubuntu-latest.zip" dist/ *.spx core_io_doodle_setup_guide.pdf
 
       - name: Upload ZIP as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.zipinfo.outputs.ZIP }}
-          path: ${{ steps.zipinfo.outputs.ZIP }}
+          name: doodle_battery_service-${{ matrix.os }}.zip
+          path: doodle_battery_service-${{ matrix.os }}.zip
 
   release:
     name: Create Release and Upload Bundles
@@ -109,19 +112,19 @@ jobs:
       - name: Download Windows ZIP
         uses: actions/download-artifact@v4
         with:
-          name: doodle_battery_bundle-windows.zip
+          name: doodle_battery_service-windows-latest.zip
           path: artifacts/
 
       - name: Download Mac ZIP
         uses: actions/download-artifact@v4
         with:
-          name: doodle_battery_bundle-macos.zip
+          name: doodle_battery_service-macos-latest.zip
           path: artifacts/
 
       - name: Download Linux ZIP
         uses: actions/download-artifact@v4
         with:
-          name: doodle_battery_bundle-linux.zip
+          name: doodle_battery_bundle-ubuntu-latest.zip
           path: artifacts/
 
       - name: Create GitHub Release and upload all bundles
