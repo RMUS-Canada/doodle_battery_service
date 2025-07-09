@@ -101,6 +101,16 @@ To restart the service:
 5. If the container is running, click the small stop button on the right side of the menu.
 6. Click the start button to start the service again.
 
+## Enable Live Data Signal
+In order to view the battery data in the Spot app, you must enable the Live Data Signal. To enable the signal:
+
+1. Tap the menu icon in the Spot app.
+2. Tap "Settings"
+3. Tap "Signals"
+4. There should be a Live Data Option in the menu labeled "Doodle Battery", tapping that will display the live data to the screen.
+
+<img src="coreio_doodle_img/signal.png" width="400px" />
+
 # Verification
 To verify that the service is configured properly and running, open the Spot app on the tablet and check if the battery percentage values are displayed in the top-left corner of the screen.
 

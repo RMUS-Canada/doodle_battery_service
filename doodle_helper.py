@@ -83,7 +83,7 @@ class StationDiscovery:
                 if self.failed_login_attempts[mac_address] >= 3:
                     self.remove_station(mac_address)
         except Exception as e:
-            self.logger.debug(f"Error processing radio {mac_address}: {str(e)}")
+            self.logger.error(f"Error processing radio {mac_address}: {str(e)}")
         finally:
             station_helper.logout()
         
@@ -118,7 +118,7 @@ class StationDiscovery:
                         self._discover_neighbors(station_helper, visited)
                         station_helper.logout()
         except Exception as e:
-            self.logger.debug(f"Error discovering neighbors: {str(e)}")
+            self.logger.error(f"Error discovering neighbors: {str(e)}")
 
     def update_station_cache(self, root_station: 'DoodleHelper') -> None:
         """Update the cache of all reachable stations (topology only)."""
@@ -153,7 +153,7 @@ class StationDiscovery:
                     if result is not None:
                         results.append(result)
                 except Exception as e:
-                    self.logger.debug(f"Error processing radio result: {str(e)}")
+                    self.logger.error(f"Error processing radio voltage result: {str(e)}")
 
         return results
 
@@ -189,7 +189,7 @@ class DoodleHelper:
                 self.token = data["result"][1]["ubus_rpc_session"]
                 return True
         except Exception as e:
-            self.logger.debug(f"Failed to login to radio at {self.url}: {str(e)}")
+            self.logger.error(f"Failed to login to radio at {self.url}: {str(e)}")
             return False
     
     def get_battery_voltage(self) -> Optional[float]:
@@ -223,7 +223,7 @@ class DoodleHelper:
 
             return None
         except Exception as e:
-            self.logger.debug(f"Error getting battery voltage from {self.url}: {str(e)}")
+            self.logger.error(f"Error getting battery voltage from {self.url}: {str(e)}")
             return None
     
     def get_associated_stations(self) -> Optional[List[Dict]]:
@@ -247,7 +247,7 @@ class DoodleHelper:
 
             return None
         except Exception as e:
-            self.logger.debug(f"Error getting associated radios from {self.url}: {str(e)}")
+            self.logger.error(f"Error getting associated radios from {self.url}: {str(e)}")
             return None
     
     def get_all_reachable_stations(self) -> List[Dict[str, any]]:
@@ -261,4 +261,4 @@ class DoodleHelper:
             self.session.close()
             self.logger.debug("Doodle logout success")
         except Exception as e:
-            self.logger.debug(f"Error during logout: {str(e)}")
+            self.logger.error(f"Error during logout: {str(e)}")
